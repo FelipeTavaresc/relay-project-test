@@ -2,7 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Relay.Application.Baseline;
 using Relay.Infrastructure.Options;
+using Relay.Infrastructure.Queries;
 
 namespace Relay.Infrastructure;
 
@@ -27,6 +29,11 @@ public static class ServiceCollectionExtensions
             var options = provider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             builder.UseNpgsql(options.ConnectionString);
         });
+
+        // Scoped, matching the scoped RelayDbContext it depends on. Registered against the interface
+        // Relay.Application declares — which is the point of the abstraction: the Api project
+        // composes the two without ever naming the implementation or an EF Core type.
+        services.AddScoped<IActivityQueries, ActivityQueries>();
 
         return services;
     }

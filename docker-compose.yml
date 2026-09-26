@@ -8,8 +8,12 @@
 # create the schema, and the seed is loaded afterwards by the documented one-liner:
 #
 #   docker compose up -d db
-#   cd backend && dotnet ef database update -p src/Relay.Infrastructure -s src/Relay.Api
+#   cd backend && dotnet ef database update -p src/Relay.Infrastructure -s src/Relay.Infrastructure
 #   docker compose exec -T db psql -v ON_ERROR_STOP=1 -U relay -d relay -f /seed/seed.sql
+#
+# Startup project is Relay.Infrastructure, not Relay.Api: EFCore.Design is a PrivateAssets="all"
+# reference there, so it does not flow to Api and `dotnet ef -s src/Relay.Api` cannot load it.
+# DesignTimeRelayDbContextFactory is what lets Infrastructure stand in as the startup project.
 #
 # The mount is the single copy of the seed — there is no duplicate under backend/.
 
