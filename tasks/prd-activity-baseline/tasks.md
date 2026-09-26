@@ -4,7 +4,7 @@
 
 - [x] 1.0 Repository skeleton — two build roots (M) — no dependencies
 - [x] 2.0 Database, EF Core model, migrations, seed load (M) — depends on 1.0
-- [ ] 3.0 BaselineCalculator domain service and unit tests (L) — depends on 1.0
+- [x] 3.0 BaselineCalculator domain service and unit tests (L) — depends on 1.0
 - [ ] 4.0 ActivityQueries and the AT TIME ZONE aggregation (M) — depends on 2.0, 3.0
 - [ ] 5.0 Endpoint — controller, DTOs, validation, ProblemDetails, logging (M) — depends on 4.0
 - [ ] 6.0 Angular feature — service, container, presentational components (L) — depends on 1.0

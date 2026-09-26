@@ -1,0 +1,20 @@
+# First and last LOCAL date each of account 6's locations has a call_received event on, over
+# its full history — not just the fetch span. FirstLocalDate separates 'this occurrence never
+# existed' from a genuine zero; all 15 start in early February, which is why this seed cannot
+# reach insufficient_history at any offered window (PRD Open Question #1).
+location,firstLocalDate,lastLocalDate
+Site A,2026-02-02,2026-07-24
+Site B,2026-02-04,2026-07-27
+Site C,2026-02-01,2026-07-27
+Site D,2026-02-01,2026-07-27
+Site E,2026-02-02,2026-07-24
+Site F,2026-02-12,2026-07-27
+Site G,2026-02-02,2026-07-21
+Site H,2026-02-02,2026-07-24
+Site I,2026-02-02,2026-07-24
+Site J,2026-02-01,2026-07-23
+Site K,2026-02-06,2026-07-27
+Site L,2026-02-03,2026-07-23
+Site M,2026-02-04,2026-07-21
+Site N,2026-02-03,2026-07-25
+Site O,2026-02-03,2026-07-22

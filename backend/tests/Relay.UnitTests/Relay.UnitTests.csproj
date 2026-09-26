@@ -23,4 +23,8 @@
     <ProjectReference Include="..\..\src\Relay.Application\Relay.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Fixtures/*.csv" />
+  </ItemGroup>
+
 </Project>
