@@ -2,10 +2,10 @@
 # LOCAL calendar date, over the fetch span for a 30-day window: 2026-05-31 .. 2026-07-27 —
 # the window 2026-06-28 .. 2026-07-27 widened by the 28-day baseline lookback.
 #
-# Derived from tasks/prd-activity-baseline/seed.sql by ai-log/seed-analysis/, converting
-# occurred_at (UTC) with real IANA rules, i.e. the bucketing Task 4.0's AT TIME ZONE query
-# performs. Two independent cross-checks hold: 2026-06-03 sums to the 485 calls techspec
-# § Key Decisions #1 states, and the totals reproduce techspec § Testing Approach exactly.
+# Derived from tasks/prd-activity-baseline/seed.sql by converting occurred_at (UTC) with real
+# IANA rules, i.e. the bucketing Task 4.0 performs in SQL. Two cross-checks against figures the
+# specs state independently both hold: 2026-06-03 sums to the 485 call_received events techspec
+# § Key Decisions #1 names, and the totals reproduce techspec § Testing Approach exactly.
 #
 # Absent days had no calls. They are zero days, not gaps (PRD FR9) — do not pad them.
 location,localDate,calls

@@ -127,13 +127,20 @@ Com falha! – Com falha:    10, Aprovado:    37, Ignorado:     0, Total:    47
 ## Notes and Decisions
 
 **Reconciliation is derived, not transcribed.** `CLAUDE.md` points at `gawk` prototypes in
-`ai-log/seed-analysis/`; that directory did not exist in the repository. Rather than hand-assert the
-figures, the fixture is derived from `seed.sql` by `ai-log/seed-analysis/`, now committed and
-re-runnable, using `TimeZoneInfo` with the IANA id — real tz rules, not the hardcoded DST cutover the
-prototypes approximated, so it agrees with Task 4.0's `AT TIME ZONE` bucketing. Two figures stated
-independently in the specs fall out of it unprompted, which is what makes it trustworthy: 2026-06-03
-sums to exactly **485** `call_received` events across account 6's 15 locations, and the account
-totals are **175 / 311.75** with `Site O` at **9 / 21.25 / −57.65%** and a band of **21.69%**.
+`ai-log/seed-analysis/` that do not exist in the repository, so the techspec figures had no in-repo
+origin. Rather than hand-assert them, the fixture was derived from `seed.sql` by parsing the insert
+statements and converting `occurred_at` with `TimeZoneInfo` on the IANA id — real tz rules, not the
+hardcoded DST cutover those prototypes approximated, so it agrees with Task 4.0's `AT TIME ZONE`
+bucketing. The derivation was a throwaway script, deliberately not committed: it duplicated the
+baseline math a second time, and a second uncommitted-then-committed implementation would have gone
+stale against `BaselineThresholds` with nothing enforcing agreement.
+
+What makes the fixture trustworthy is that two figures the specs state independently fell out of that
+derivation unprompted: 2026-06-03 sums to exactly **485** `call_received` events across account 6's 15
+locations (techspec § Key Decisions #1), and the account totals are **175 / 311.75** with `Site O` at
+**9 / 21.25 / −57.65%** and a band of **21.69%** (techspec § Testing Approach). Both are now asserted
+by tests. Task 8.0 re-checks the same figures end to end against the running endpoint, which is the
+verification path that survives.
 
 **One spec figure does not reconcile — flagged, not silently followed.** The sample response in
 techspec § API Endpoints shows `Site O` with `"sharePercent": 41.2`. The derived share is **31.76%**
@@ -183,4 +190,3 @@ order-independence (FR10) true at the same time.
 - `backend/tests/Relay.UnitTests/Fixtures/account-6-location-history.csv`
 - `backend/tests/Relay.UnitTests/Relay.UnitTests.csproj` — fixtures registered as embedded resources
 - `backend/tests/Relay.UnitTests/ScaffoldingTests.cs` — deleted; this suite replaces it, as its own comment said it should
-- `ai-log/seed-analysis/` — the re-runnable derivation behind the fixture
