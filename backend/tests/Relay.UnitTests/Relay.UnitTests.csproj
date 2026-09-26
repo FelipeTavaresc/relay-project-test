@@ -21,6 +21,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Relay.Application\Relay.Application.csproj" />
+    <!-- The boundary mapping (domain records -> wire contract) is unit-testable on its own; this
+         reference is for that, not for spinning up a host. There are no integration tests, by
+         decision recorded in techspec § Standards Compliance. -->
+    <ProjectReference Include="..\..\src\Relay.Api\Relay.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
