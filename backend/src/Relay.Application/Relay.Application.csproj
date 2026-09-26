@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Deliberately has no ProjectReference and no package reference. This is the pure
+       domain layer: it declares the abstractions (IActivityQueries) that Infrastructure
+       implements, so the dependency arrow points inward and never at EF Core. -->
+
+</Project>

@@ -1,0 +1,23 @@
+# --- .NET (backend/) ---
+bin/
+obj/
+*.user
+*.suo
+TestResults/
+coverage/
+*.coverage
+*.cobertura.xml
+
+# --- Node / Angular (frontend/) ---
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+
+# --- Editors / OS ---
+.vs/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

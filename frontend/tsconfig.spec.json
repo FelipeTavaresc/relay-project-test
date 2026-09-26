@@ -1,0 +1,11 @@
+/* Spec compilation for Jest. Karma/Jasmine was replaced by Jest per techspec § Testing Approach,
+   so the types are jest and the module format is the CommonJS one jest-preset-angular expects. */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "module": "CommonJS",
+    "types": ["jest"]
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.spec.ts", "setup-jest.ts"]
+}

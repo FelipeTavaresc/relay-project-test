@@ -1,0 +1,12 @@
+<Project>
+
+  <!-- Applies to every project under backend/. Individual .csproj files deliberately do not
+       restate these: one place to change the target framework or the warning policy. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>
