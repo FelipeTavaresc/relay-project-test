@@ -1,6 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <!-- Npgsql, not SqlServer: Postgres accepts the seed's IANA timezone names directly in
+         `AT TIME ZONE`, which is what makes the Task 4.0 aggregation possible at all
+         (techspec § Key Decisions #2). Pinned to the 8.0.x line to match net8.0. -->
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+    <!-- OptionsBuilder.Bind / .ValidateDataAnnotations: the connection string is bound through
+         IOptions&lt;T&gt;, never read as a raw configuration key in business code. -->
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Relay.Application\Relay.Application.csproj" />
   </ItemGroup>
 

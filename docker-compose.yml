@@ -1,0 +1,41 @@
+# Local development stack for DASH-247.
+# Task 8.0 adds the `api` (build context ./backend) and `web` (./frontend) services alongside `db`.
+#
+# Schema/seed ordering — decided in Task 2.0: MIGRATIONS OWN THE SCHEMA.
+# seed.sql is mounted read-only at /seed/seed.sql and is deliberately NOT placed in
+# /docker-entrypoint-initdb.d: initdb runs before EF Core migrations exist, so the INSERTs
+# would hit tables that have not been created yet. The container starts empty, migrations
+# create the schema, and the seed is loaded afterwards by the documented one-liner:
+#
+#   docker compose up -d db
+#   cd backend && dotnet ef database update -p src/Relay.Infrastructure -s src/Relay.Api
+#   docker compose exec -T db psql -v ON_ERROR_STOP=1 -U relay -d relay -f /seed/seed.sql
+#
+# The mount is the single copy of the seed — there is no duplicate under backend/.
+
+services:
+  db:
+    # Debian-based rather than -alpine on purpose: the aggregation in Task 4.0 depends on
+    # `AT TIME ZONE '<IANA name>'` resolving real tzdata (DST, America/Phoenix, UTC).
+    image: postgres:16
+    container_name: relay-db
+    environment:
+      POSTGRES_DB: relay
+      POSTGRES_USER: relay
+      # Local throwaway container only. The API reads its connection string from
+      # configuration (Database:ConnectionString), never from a hardcoded literal.
+      POSTGRES_PASSWORD: relay
+    ports:
+      - "5432:5432"
+    volumes:
+      - relay-db-data:/var/lib/postgresql/data
+      - ./tasks/prd-activity-baseline/seed.sql:/seed/seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relay -d relay"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  relay-db-data:
