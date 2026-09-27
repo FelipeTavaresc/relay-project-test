@@ -1,0 +1,7 @@
+# Build output and local state never belong in the build context: they would be copied in,
+# invalidate the layer cache on every rebuild, and can shadow the container's own restore.
+**/bin/
+**/obj/
+**/TestResults/
+**/*.user
+.vs/

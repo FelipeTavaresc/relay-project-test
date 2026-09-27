@@ -1,0 +1,7 @@
+# node_modules is reinstalled inside the image from package-lock.json (`npm ci`), and the Angular
+# cache is host-specific. Copying either would bloat the context and can break the build outright
+# when the host and the image differ in platform.
+node_modules/
+.angular/
+dist/
+coverage/

@@ -1,21 +1,27 @@
-# Local development stack for DASH-247.
-# Task 8.0 adds the `api` (build context ./backend) and `web` (./frontend) services alongside `db`.
+# The whole stack for DASH-247: `docker compose up` from a clean checkout reaches a seeded,
+# working dashboard at http://localhost:4200 with no host toolchain beyond Docker itself.
+#
+# Five services, in dependency order:
+#
+#   db       Postgres 16, empty on first start
+#   migrate  one-shot `dotnet ef database update`  — creates the schema
+#   seed     one-shot psql load of seed.sql        — loads the data, only if empty
+#   api      the .NET API, published on 5141
+#   web      the built Angular bundle behind nginx, published on 4200
 #
 # Schema/seed ordering — decided in Task 2.0: MIGRATIONS OWN THE SCHEMA.
 # seed.sql is mounted read-only at /seed/seed.sql and is deliberately NOT placed in
-# /docker-entrypoint-initdb.d: initdb runs before EF Core migrations exist, so the INSERTs
-# would hit tables that have not been created yet. The container starts empty, migrations
-# create the schema, and the seed is loaded afterwards by the documented one-liner:
+# /docker-entrypoint-initdb.d: initdb runs before the schema exists, so every INSERT would hit a
+# missing table. The order is empty container -> migrations -> seed, which is what the `migrate`
+# and `seed` services encode. The mount is the single copy of the seed — there is no duplicate
+# under backend/.
 #
-#   docker compose up -d db
-#   cd backend && dotnet ef database update -p src/Relay.Infrastructure -s src/Relay.Infrastructure
-#   docker compose exec -T db psql -v ON_ERROR_STOP=1 -U relay -d relay -f /seed/seed.sql
+# The same three steps can still be driven by hand against a bare `db` (README § Running it),
+# which is the path used during development.
 #
-# Startup project is Relay.Infrastructure, not Relay.Api: EFCore.Design is a PrivateAssets="all"
-# reference there, so it does not flow to Api and `dotnet ef -s src/Relay.Api` cannot load it.
-# DesignTimeRelayDbContextFactory is what lets Infrastructure stand in as the startup project.
-#
-# The mount is the single copy of the seed — there is no duplicate under backend/.
+# No secrets here: the Postgres credentials below are a throwaway local container's, and the API
+# receives its connection string as an environment variable (Database__ConnectionString) rather
+# than from appsettings.json, which ships with that value empty.
 
 services:
   db:
@@ -40,6 +46,87 @@ services:
       timeout: 3s
       retries: 10
       start_period: 10s
+
+  migrate:
+    # The SDK-based `migrator` stage, not the runtime `api` stage: `dotnet ef` needs the SDK and
+    # the project sources. One shot — it exits 0 once the database is at the latest migration, and
+    # is a no-op on every subsequent `up`.
+    build:
+      context: ./backend
+      target: migrator
+    container_name: relay-migrate
+    environment:
+      # Read by DesignTimeRelayDbContextFactory, which is what lets Relay.Infrastructure stand in
+      # as its own startup project (EFCore.Design is PrivateAssets="all" there and never reaches
+      # Relay.Api).
+      RELAY_DB_CONNECTION: Host=db;Port=5432;Database=relay;Username=relay;Password=relay
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  seed:
+    # Runs in the postgres image so psql is present; the script is mounted rather than baked into
+    # an image of its own.
+    image: postgres:16
+    container_name: relay-seed
+    environment:
+      PGHOST: db
+      PGUSER: relay
+      PGPASSWORD: relay
+      PGDATABASE: relay
+    volumes:
+      - ./tasks/prd-activity-baseline/seed.sql:/seed/seed.sql:ro
+      - ./scripts/load-seed.sh:/usr/local/bin/load-seed.sh:ro
+    entrypoint: ["bash", "/usr/local/bin/load-seed.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        # The tables must exist before the INSERTs run. This is the ordering decision, enforced.
+        condition: service_completed_successfully
+    restart: "no"
+
+  api:
+    build:
+      context: ./backend
+      target: api
+    container_name: relay-api
+    environment:
+      # Production, so appsettings.Development.json (which carries the localhost connection
+      # string) is not loaded and the value below is the only source.
+      ASPNETCORE_ENVIRONMENT: Production
+      Database__ConnectionString: Host=db;Port=5432;Database=relay;Username=relay;Password=relay
+      # The origin `web` is published on — the browser's view of it, not the compose network's.
+      Frontend__AllowedOrigins__0: http://localhost:4200
+    ports:
+      # 5141 matches the `dotnet run` profile and the frontend's default API base URL, so the SPA
+      # talks to the same address whichever way the API is started.
+      - "5141:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      seed:
+        # Not strictly required to boot — but a dashboard that comes up empty because the seed is
+        # still loading looks like a bug in the feature.
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: ./frontend
+      target: web
+      args:
+        # Baked into the bundle: the browser reaches the API on the host's published port.
+        API_BASE_URL: http://localhost:5141
+        # Account 6 (Metro Collision Centers, 15 locations) — the PRD's reference case. No tenant
+        # picker: multi-account switching is out of scope.
+        ACCOUNT_ID: 6
+    container_name: relay-web
+    ports:
+      - "4200:80"
+    depends_on:
+      api:
+        condition: service_started
 
 volumes:
   relay-db-data:
