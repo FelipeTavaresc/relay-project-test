@@ -47,7 +47,9 @@ type ControlsForm = FormGroup<{
             {{ name }}
           </label>
         } @empty {
-          <p class="note">Locations appear once the report has loaded.</p>
+          <!-- Covers both "not loaded yet" and account 20, which has loaded and has no activity
+               to name any location with (PRD FR17). -->
+          <p class="note">Locations appear here once a report with activity has loaded.</p>
         }
         <p class="note">Unticking every location shows them all again.</p>
       </fieldset>
