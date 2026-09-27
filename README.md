@@ -12,8 +12,7 @@ events/day against 23–25 at weekends — and it is explainable to a customer i
 
 One endpoint (`GET /api/v1/accounts/{accountId}/activity-baseline`), one Angular view. Requirements in
 [`prd.md`](tasks/prd-activity-baseline/prd.md), design in
-[`techspec.md`](tasks/prd-activity-baseline/techspec.md), the raw AI log in [`AI_LOG.md`](AI_LOG.md) and
-[`tasks/prd-activity-baseline/AI_LOG.md`](tasks/prd-activity-baseline/AI_LOG.md).
+[`techspec.md`](tasks/prd-activity-baseline/techspec.md), and the raw AI log in [`AI_LOG.md`](AI_LOG.md).
 
 ## Running it
 
