@@ -1,1 +1,34 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global scale, colour tokens, and focus visibility only. Everything else is component-scoped
+   (`angular.md` § Templates and forms: function over form, no global overrides). */
+
+:root {
+  --ink: #1b1b1f;
+  --muted: #5a5a66;
+  --rule: #c9c9d2;
+  --focus: #0b57d0;
+
+  color-scheme: light;
+}
+
+body {
+  background: #fff;
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.45;
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.35rem 0.85rem;
+}
